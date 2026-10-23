@@ -1,0 +1,6 @@
+cmake -B build -DGALDR_ENABLE_ASIO=ON -DASIO_SDK_DIR=C:\Users\user\galdr_compile\galdr\asiosdk
+
+cmake --build build --config Release
+
+# program folder
+C:\Users\user\galdr_compile\galdr\build\Galdr_artefacts\Release

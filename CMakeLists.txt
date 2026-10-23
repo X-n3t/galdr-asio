@@ -43,6 +43,29 @@ target_compile_definitions(Galdr PUBLIC
     # Disabling the splash screen is permitted when JUCE is used under the (A)GPL.
     JUCE_DISPLAY_SPLASH_SCREEN=0)
 
+# Optional ASIO support for the Windows standalone (off by default).
+# JUCE ships without ASIO; the standalone then only offers Windows Audio and
+# DirectSound. To enable it, download the ASIO SDK (GPLv3 option, compatible
+# with Galdr's licence) and configure with:
+#   cmake -B build -DGALDR_ENABLE_ASIO=ON -DASIO_SDK_DIR=C:/path/to/asiosdk
+option(GALDR_ENABLE_ASIO "Build with ASIO support (Windows only, needs the ASIO SDK)" OFF)
+set(ASIO_SDK_DIR "" CACHE PATH "Folder of the Steinberg ASIO SDK (contains common/ and host/)")
+if(GALDR_ENABLE_ASIO)
+    if(NOT WIN32)
+        message(WARNING "GALDR_ENABLE_ASIO is only meaningful on Windows; ignoring.")
+    elseif(NOT EXISTS "${ASIO_SDK_DIR}/common/iasiodrv.h")
+        message(FATAL_ERROR
+            "GALDR_ENABLE_ASIO=ON but ASIO_SDK_DIR ('${ASIO_SDK_DIR}') does not "
+            "contain common/iasiodrv.h. Point ASIO_SDK_DIR at the extracted SDK folder.")
+    else()
+        target_compile_definitions(Galdr PUBLIC JUCE_ASIO=1)
+        target_include_directories(Galdr PUBLIC
+            "${ASIO_SDK_DIR}/common"
+            "${ASIO_SDK_DIR}/host"
+            "${ASIO_SDK_DIR}/host/pc")
+    endif()
+endif()
+
 target_link_libraries(Galdr
     PRIVATE
         GaldrAssets
